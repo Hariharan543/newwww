@@ -1,0 +1,333 @@
+hibernate.cfg:
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC  
+          "-//Hibernate/Hibernate Configuration DTD 3.0//EN"  
+          "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">  
+  
+<hibernate-configuration>  
+  
+    <session-factory>  
+        <property name="hbm2ddl.auto">update</property>  
+        <property name="dialect">org.hibernate.dialect.MySQLDialect</property>  
+        <property name="connection.url">jdbc:mysql://localhost:3306/PMS</property>  
+        <property name="connection.username">root</property>  
+        <property name="connection.password">dsrc</property>  
+        <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+      <mapping class="com.dsrc.model.Product"/>
+    </session-factory>  
+  
+</hibernate-configuration>  
+
+
+Mymain:
+public class MyMain 
+{
+		public static void main(String[] args) 
+		{
+			MenuScreen ms = new MenuScreen();
+			ms.showMenu();
+			
+		}
+}
+
+
+
+Menuscreen.java
+public class MenuScreen
+{
+
+	public int showMenu() {
+	Scanner sc = new Scanner(System.in);
+		System.out.println("SHOW MENU");
+		System.out.println("-------------");
+		System.out.println("1. Product");
+		System.out.println("2. Sales");
+		System.out.println("3. Staff");
+		System.out.println("4. Customer");
+		System.out.println("Enter Your Choice :");
+		
+		int s = sc.nextInt();
+		if(s==1){
+			ProductController pc = new ProductController();
+			pc.productManage();
+		}
+	
+		return 0;
+	}
+
+}
+
+
+
+Productscreen.java
+public class ProductScreen 
+{
+		public int shoeProductScreen()
+		{
+			Scanner sc = new Scanner(System.in);
+			System.out.println("PRODUCT MENU");
+			System.out.println("-------------");
+			System.out.println("1. New Product");
+			System.out.println("2. Edit Product");
+			System.out.println("3. Delete Product");
+			System.out.println("4. List Product");
+			System.out.println("5. Search Product");
+			System.out.println("6. Exit.");
+			System.out.println("Enter Your Choice :");
+			
+			int s = sc.nextInt();
+			if(s==1){
+				System.out.println("Enter Product ID:");
+				int id = sc.nextInt();
+				System.out.println("Enter Product Name :");
+				String name = sc.next();
+				System.out.println("Enter ProductPrice :");
+				int price = sc.nextInt();
+				
+			
+				
+				Product pro = new Product(id,name,price);
+				DataValidator dv = new DataValidator();
+				dv.validateProduct(pro);
+			}
+			return 0;
+		}
+}
+
+
+
+Productcontroller.java
+public class ProductController
+{
+		public int productManage()
+		{
+			
+			ProductScreen pc = new ProductScreen();
+			pc.shoeProductScreen();
+			return 0;
+		}
+}
+
+
+
+Datavalidator.java
+public class DataValidator 
+{
+	public boolean validateProduct(Product product)
+	{
+		// Code to call DAO..
+		HibernateUtil hu = new HibernateUtil();
+		boolean res=hu.saveProduct(product);
+		if(res==true){
+			System.out.println("Product added sucessfully!");
+		}
+		return true;
+	}
+}
+
+
+Product.bean
+import javax.persistence.*;
+
+@Entity
+@Table(name="ProductDetails")
+public class Product {
+	@Id
+	@Column(name="ProductId")
+	private int productid;
+	@Column(name="ProductName")
+	private String productname;
+	@Column(name="Price")
+	private int price;
+	
+	public Product(int productid, String productname, int price) {
+		
+		this.productid = productid;
+		this.productname = productname;
+		this.price = price;
+	}
+
+	public int getProductid() {
+		return productid;
+	}
+
+	public void setProductid(int productid) {
+		this.productid = productid;
+	}
+
+	public String getProductname() {
+		return productname;
+	}
+
+	public void setProductname(String productname) {
+		this.productname = productname;
+	}
+
+	public int getPrice() {
+		return price;
+	}
+
+	public void setPrice(int price) {
+		this.price = price;
+	}
+}
+
+
+
+HibernateUtil.java
+public class HibernateUtil 
+{
+	public boolean saveProduct(Product product)
+	{
+		SessionFactory sf = new AnnotationConfiguration().configure()
+				.addAnnotatedClass(Product.class).buildSessionFactory();
+		Session ss = sf.openSession();
+		Transaction tran = ss.beginTransaction();
+		ss.save(product);
+		tran.commit();
+		ss.close();
+		return true;
+	}
+}
+
+
+.................................................................................................
+2)
+same as question1(modify question 1)
+
+ProductScreen.java
+case2:
+	System.out.println("Enter Product ID:");
+				int id1 = sc.nextInt();
+				System.out.println("Enter Product Name :");
+				String name1 = sc.next();
+				System.out.println("Enter ProductPrice :");
+				int price1 = sc.nextInt();
+				Product pr = new Product(id1, name1, price1);
+				
+				DataValidator dv1 = new DataValidator();
+				dv1.updateProduct(pr);
+				break;
+
+
+DataValidator.java:
+public boolean updateProduct(Product product)
+	{
+		//Code to call DAO.
+		HibernateUtil hu = new HibernateUtil();
+		try{
+		boolean res=hu.updateProduct(product);
+		
+			System.out.println("Product information Updated!");
+			ProductScreen ps = new ProductScreen();
+			ps.shoeProductScreen();
+		}catch(Exception e)
+		{
+		
+			System.out.println("INVALID ID");
+			ProductScreen ps = new ProductScreen();
+			ps.shoeProductScreen();
+		}
+
+		return true;
+
+
+HibernateUtil.java
+public boolean updateProduct(Product product)
+	{
+		SessionFactory sf = new AnnotationConfiguration().configure()
+				.addAnnotatedClass(Product.class).buildSessionFactory();
+		Session ss = sf.openSession();
+		Transaction tran = ss.beginTransaction();
+		ss.update(product);
+		tran.commit();
+		ss.close();
+		return true;
+	}
+
+..............................................................................................
+3.
+Delete the data
+
+Product Screen:
+case 3:
+
+					System.out.println("Enter Product ID:");
+					int id2 = sc.nextInt();
+					 
+					Product pro1 = new Product(id2);
+					DataValidator dv2 = new DataValidator();
+					dv2.deleteProduct(pro1);
+					break;
+
+
+
+DataValidators.java
+public boolean deleteProduct(Product product)
+	{
+	    HibernateUtil hu = new HibernateUtil();
+	   
+	    	boolean res = hu.deleteProduct(product);
+	    	
+		return true;
+
+
+
+HibernateUtil.java
+public boolean deleteProduct(Product product)
+	{
+		
+		SessionFactory sf = new AnnotationConfiguration().configure()
+				.addAnnotatedClass(Product.class).buildSessionFactory();
+		Session ss = sf.openSession();
+		try{
+		Transaction tran = ss.beginTransaction();
+		Product pd = (Product) ss.get(Product.class, product.getProductid());
+		ss.delete(pd);
+		tran.commit();
+		ss.close();
+		System.out.println("Deleted Successfully");
+		  ProductScreen ps = new ProductScreen();
+			ps.shoeProductScreen();
+		}
+		catch(Exception e){
+			System.out.println("Invalid id");
+		    ProductScreen ps = new ProductScreen();
+						ps.shoeProductScreen();
+		}
+		return true;
+}
+.............................................................................................
+4.To Select the data
+
+Product Screen:
+	HibernateUtil hb = new HibernateUtil();
+				hb.selectAllProducts();
+
+
+
+
+Hibernate.Util.java
+	public List<Product> selectAllProducts()
+	{
+		SessionFactory sf = new AnnotationConfiguration().configure()
+				.addAnnotatedClass(Product.class).buildSessionFactory();
+		Session ss = sf.openSession();
+		Transaction tran = ss.beginTransaction();
+		List ls = ss.createQuery("from Product").list();
+		System.out.println("---------------------------------------------");
+		System.out.printf("%-5s %-20s %-10s" , "ProductId","ProductName","ProductPrice");
+		System.out.println();
+		System.out.println("---------------------------------------------");
+		for(java.util.Iterator it = ls.iterator(); it.hasNext(); ){
+		   Product pro = (Product) it.next();
+		   System.out.format("%-5d %-20s %-10d", pro.getProductid(), pro.getProductname(), pro.getPrice());
+		   System.out.println();
+			}
+		System.out.println("---------------------------------------------");
+		tran.commit();
+		ss.close();
+		
+		return null;
+		
+	}
